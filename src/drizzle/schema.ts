@@ -25,7 +25,7 @@ export const ProductTable = pgTable(
   "products",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    clerkUserId: uuid("clerk_user_id").notNull(),
+    clerkUserId: text("clerk_user_id").notNull(),
     name: text("name").notNull(),
     url: text("url").notNull(),
     description: text("description"),
@@ -114,7 +114,6 @@ export const countryRelations = relations(CountryTable, ({ many, one }) => ({
     references: [CountryGroupTable.id],
   }),
   productViews: many(ProductViewTable),
-  countryGroupDiscounts: many(CountryGroupDiscountTable),
 }));
 
 export const CountryGroupTable = pgTable("country_groups", {
