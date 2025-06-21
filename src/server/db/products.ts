@@ -1,11 +1,11 @@
 import { db } from "@/drizzle/db";
 import { ProductCustomizationTable, ProductTable } from "@/drizzle/schema";
-import { CACHE_TAG, dbCache, getUserTag, revalidateDbCache } from "@/lib/cache";
+import { CACHE_TAGS, dbCache, getUserTag, revalidateDbCache } from "@/lib/cache";
 import { and, eq } from "drizzle-orm";
 
 export function getProducts(userId: string, { limit }: { limit?: number }) {
   const cacheFn = dbCache(getProductsInternal, {
-    tags: [getUserTag(userId, CACHE_TAG.products)],
+    tags: [getUserTag(userId, CACHE_TAGS.products)],
   });
   return cacheFn(userId, { limit });
 }
@@ -31,7 +31,7 @@ export async function createProduct(data: typeof ProductTable.$inferInsert) {
   }
 
   revalidateDbCache({
-    tag: CACHE_TAG.products,
+    tag: CACHE_TAGS.products,
     userId: newProduct.userId,
     id: newProduct.id,
   });
@@ -52,7 +52,7 @@ export async function deleteProduct({
 
   if (rowCount > 0) {
     revalidateDbCache({
-      tag: CACHE_TAG.products,
+      tag: CACHE_TAGS.products,
       userId: userId,
       id: id,
     });
