@@ -36,10 +36,14 @@ export default function ProductDetailsForm() {
       if (data.error) {
         toast.error("An error occurred", {
           description: data.message,
+          position: "top-center",
+          richColors: true,
         });
       } else {
         toast.success("Product saved successfully!", {
           description: data.message,
+          position: "top-center",
+          richColors: true,
         });
         form.reset();
       }
