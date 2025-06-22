@@ -16,21 +16,36 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { productDetailsSchema } from "@/schemas/products";
 import { z } from "zod";
-import { createProduct } from "@/server/actions/products";
+import { createProduct, updateProduct } from "@/server/actions/products";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-export default function ProductDetailsForm() {
+export default function ProductDetailsForm({
+  product,
+}: {
+  product?: {
+    id: string;
+    name: string;
+    description: string | null;
+    url: string;
+  };
+}) {
   const form = useForm<z.infer<typeof productDetailsSchema>>({
     resolver: zodResolver(productDetailsSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      url: "",
-    },
+    defaultValues: product
+      ? { ...product, description: product.description ?? "" }
+      : {
+          name: "",
+          description: "",
+          url: "",
+        },
   });
 
+  const router = useRouter();
+
   async function onSubmit(values: z.infer<typeof productDetailsSchema>) {
-    const data = await createProduct(values);
+    const action = product == null ? createProduct : updateProduct.bind(null,product.id)
+    const data = await action(values);
 
     if (data?.message) {
       if (data.error) {
@@ -46,6 +61,7 @@ export default function ProductDetailsForm() {
           richColors: true,
         });
         form.reset();
+        router.refresh();
       }
     }
   }

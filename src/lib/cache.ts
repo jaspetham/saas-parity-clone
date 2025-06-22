@@ -51,6 +51,6 @@ export function revalidateDbCache({
     revalidateTag(getUserTag(userId, tag));
   }
   if (id != null) {
-    revalidateTag(getUserTag(id, tag));
+    revalidateTag(getIdTag(id, tag));
   }
 }
