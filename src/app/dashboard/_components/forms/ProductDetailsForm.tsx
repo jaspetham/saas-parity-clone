@@ -18,7 +18,7 @@ import { productDetailsSchema } from "@/schemas/products";
 import { z } from "zod";
 import { createProduct, updateProduct } from "@/server/actions/products";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function ProductDetailsForm({
   product,
@@ -40,11 +40,18 @@ export default function ProductDetailsForm({
           url: "",
         },
   });
-
-  const router = useRouter();
+  // Ensure form values update when product prop changes
+  useEffect(() => {
+    if (product) {
+      form.reset({
+        ...product,
+        description: product.description ?? "",
+      });
+    }
+  }, [product, form]);
 
   async function onSubmit(values: z.infer<typeof productDetailsSchema>) {
-    const action = product == null ? createProduct : updateProduct.bind(null,product.id)
+    const action = product == null ? createProduct : updateProduct.bind(null, product.id);
     const data = await action(values);
 
     if (data?.message) {
@@ -60,8 +67,6 @@ export default function ProductDetailsForm({
           position: "top-center",
           richColors: true,
         });
-        form.reset();
-        router.refresh();
       }
     }
   }
