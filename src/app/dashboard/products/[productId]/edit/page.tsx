@@ -1,10 +1,17 @@
-import { getProduct } from "@/server/db/products";
+import { getProduct, getProductCountryGroups } from "@/server/db/products";
 import { auth } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
 import { PageWithBackButton } from "../../../_components/PageWithBackButton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import ProductDetailsForm from "@/app/dashboard/_components/forms/ProductDetailsForm";
+import CountryDiscountsForm from "@/app/dashboard/_components/forms/CountryDiscountsForm";
 
 export default async function EditProductPage(props: {
   params: { productId: string };
@@ -33,7 +40,9 @@ export default async function EditProductPage(props: {
         <TabsContent value="details">
           <DetailsTab product={product} />
         </TabsContent>
-        <TabsContent value="country">Country</TabsContent>
+        <TabsContent value="country">
+          <CountryTab productId={productId} userId={userId} />
+        </TabsContent>
         <TabsContent value="customization">Customization</TabsContent>
       </Tabs>
     </PageWithBackButton>
@@ -56,6 +65,46 @@ function DetailsTab({
       </CardHeader>
       <CardContent>
         <ProductDetailsForm product={product} />
+      </CardContent>
+    </Card>
+  );
+}
+async function CountryTab({
+  productId,
+  userId,
+}: {
+  productId: string;
+  userId: string;
+}) {
+  const countryGroups = await getProductCountryGroups({
+    productId,
+    userId,
+  });
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-xl">Country Discounts</CardTitle>
+        <CardDescription>
+          Leave the discount field blank if you do not want to display deals for
+          any specific parity group.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <CountryDiscountsForm
+          productId={productId}
+        //   countryGroups={countryGroups}
+          countryGroups={[{
+            countries:[
+                {code : "US", name: "United States"},
+                {code : "CA", name: "Canada"},
+                {code : "GB", name: "United Kingdom"},
+            ],
+            id:"1",
+            name: "Group 1",
+            recommendedDiscountPercentage: 0.1,
+            discount:{coupon:"Hi", discountPercentage: 0.2}
+          }]}
+        />
       </CardContent>
     </Card>
   );
