@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import ProductDetailsForm from "@/app/dashboard/_components/forms/ProductDetailsForm";
 import CountryDiscountsForm from "@/app/dashboard/_components/forms/CountryDiscountsForm";
+import { clearFullCache } from "@/lib/cache";
 
 export default async function EditProductPage(props: {
   params: { productId: string };
@@ -80,6 +81,7 @@ async function CountryTab({
     productId,
     userId,
   });
+
   return (
     <Card>
       <CardHeader>
@@ -92,18 +94,7 @@ async function CountryTab({
       <CardContent>
         <CountryDiscountsForm
           productId={productId}
-        //   countryGroups={countryGroups}
-          countryGroups={[{
-            countries:[
-                {code : "US", name: "United States"},
-                {code : "CA", name: "Canada"},
-                {code : "GB", name: "United Kingdom"},
-            ],
-            id:"1",
-            name: "Group 1",
-            recommendedDiscountPercentage: 0.1,
-            discount:{coupon:"Hi", discountPercentage: 0.2}
-          }]}
+          countryGroups={countryGroups}
         />
       </CardContent>
     </Card>

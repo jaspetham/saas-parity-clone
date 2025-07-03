@@ -2,6 +2,7 @@
   "name": "saas-parity-clone",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,7 +10,8 @@
     "lint": "next lint",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:updateCountryGroups": "tsx --env-file=.env ./src/tasks/updateCountryGroups.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.21.0",

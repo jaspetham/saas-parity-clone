@@ -1,42 +1,40 @@
-import { revalidateTag, unstable_cache } from "next/cache";
-import { cache } from "react";
+import { revalidateTag, unstable_cache } from "next/cache"
+import { cache } from "react"
 
 export type ValidTags =
   | ReturnType<typeof getGlobalTag>
   | ReturnType<typeof getUserTag>
-  | ReturnType<typeof getIdTag>;
+  | ReturnType<typeof getIdTag>
 
 export const CACHE_TAGS = {
   products: "products",
   productViews: "productViews",
-  subscriptions: "subscriptions",
-  countries:"countries",
-  countryGroups:"countries"
-} as const;
+  subscription: "subscription",
+  countries: "countries",
+  countryGroups: "countryGroups",
+} as const
 
 export function getGlobalTag(tag: keyof typeof CACHE_TAGS) {
-  return `global:${CACHE_TAGS[tag]}` as const;
+  return `global:${CACHE_TAGS[tag]}` as const
 }
 
 export function getUserTag(userId: string, tag: keyof typeof CACHE_TAGS) {
-  return `user:${userId}-${CACHE_TAGS[tag]}` as const;
+  return `user:${userId}-${CACHE_TAGS[tag]}` as const
 }
 
 export function getIdTag(id: string, tag: keyof typeof CACHE_TAGS) {
-  return `user:${id}-${CACHE_TAGS[tag]}` as const;
+  return `id:${id}-${CACHE_TAGS[tag]}` as const
 }
 
 export function clearFullCache() {
-  revalidateTag("*");
+  revalidateTag("*")
 }
 
 export function dbCache<T extends (...args: any[]) => Promise<any>>(
-  callback: Parameters<typeof unstable_cache<T>>[0],
+  cb: Parameters<typeof unstable_cache<T>>[0],
   { tags }: { tags: ValidTags[] }
 ) {
-  return cache(
-    unstable_cache<T>(callback, undefined, { tags: [...tags, "*"] })
-  );
+  return cache(unstable_cache<T>(cb, undefined, { tags: [...tags, "*"] }))
 }
 
 export function revalidateDbCache({
@@ -44,15 +42,15 @@ export function revalidateDbCache({
   userId,
   id,
 }: {
-  tag: keyof typeof CACHE_TAGS;
-  userId?: string;
-  id?: string;
+  tag: keyof typeof CACHE_TAGS
+  userId?: string
+  id?: string
 }) {
-  revalidateTag(getGlobalTag(tag));
+  revalidateTag(getGlobalTag(tag))
   if (userId != null) {
-    revalidateTag(getUserTag(userId, tag));
+    revalidateTag(getUserTag(userId, tag))
   }
   if (id != null) {
-    revalidateTag(getIdTag(id, tag));
+    revalidateTag(getIdTag(id, tag))
   }
 }
