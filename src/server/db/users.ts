@@ -21,7 +21,7 @@ export async function deleteUser(clerkUserId: string) {
 
   userSubscriptions.forEach((sub) => {
     revalidateDbCache({
-      tag: CACHE_TAGS.subscriptions,
+      tag: CACHE_TAGS.subscription,
       id: sub.id,
       userId: clerkUserId,
     });
