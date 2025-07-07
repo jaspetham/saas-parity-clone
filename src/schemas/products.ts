@@ -38,3 +38,13 @@ export const productCountryDiscountsSchema = z.object({
       )
   ),
 });
+
+export const productCustomizationSchema = z.object({
+    classPrefix: z.string().optional(),
+    backgroundColor: z.string().min(1, "Background color is required"),
+    textColor: z.string().min(1, "Text color is required"),
+    fontSize: z.string().min(1, "Font size is required"),
+    locationMessage: z.string().min(1, "Location message is required"),
+    bannerContainer: z.string().min(1, "Banner container is required"),
+    isSticky: z.boolean()
+})

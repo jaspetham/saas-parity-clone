@@ -3,7 +3,7 @@ import { ArrowRightIcon, CheckIcon } from "lucide-react";
 import Link from "next/link";
 import { ClerkIcon } from "./_icons/Clerk";
 import { NeonIcon } from "./_icons/Neon";
-import { subscriptionTiersInOrder } from "../../data/subscriptionsTier";
+import { subscriptionTiersInOrder } from "@/data/subscriptionsTier";
 import {
   Card,
   CardContent,

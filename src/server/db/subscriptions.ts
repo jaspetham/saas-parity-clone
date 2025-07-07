@@ -2,7 +2,6 @@ import { subscriptionTiers } from "@/data/subscriptionsTier";
 import { db } from "@/drizzle/db";
 import { UserSubscriptionTable } from "@/drizzle/schema";
 import { CACHE_TAGS, dbCache, getUserTag, revalidateDbCache } from "@/lib/cache";
-import { get } from "http";
 
 export async function createUserSubscription(
   data: typeof UserSubscriptionTable.$inferInsert
@@ -55,9 +54,6 @@ export async function getUserSubscriptionTier(userId:string){
 
 function getUserSubscriptionInternal(userId:string){
     return db.query.UserSubscriptionTable.findFirst({
-        where: ({clerkUserId}, { eq }) => eq(clerkUserId, userId),
-        with: {
-            user: true,
-        },
-    });
+        where: ({ clerkUserId }, { eq }) => eq(clerkUserId, userId),
+    })
 }
