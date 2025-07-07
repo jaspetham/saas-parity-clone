@@ -15,7 +15,7 @@ import {
 import { formatCompactNumber } from "@/lib/formatter";
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { BrandLogo } from "@/components/Brandlogo";
+import { BrandLogo } from "@/components/BrandLogo";
 import { Button } from "@/components/ui/button";
 
 export default function HomePage() {
