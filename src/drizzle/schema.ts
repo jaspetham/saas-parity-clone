@@ -21,6 +21,7 @@ const updatedAt = timestamp("updated_at", { withTimezone: true })
   .defaultNow()
   .$onUpdate(() => new Date());
 
+// 1. ProductTable
 export const ProductTable = pgTable(
   "products",
   {
@@ -35,11 +36,28 @@ export const ProductTable = pgTable(
   (table) => [index("clerk_user_id_index").on(table.clerkUserId)]
 );
 
-export const productRelations = relations(ProductTable, ({ one, many }) => ({
-  productCustomization: one(ProductCustomizationTable),
-  productViews: many(ProductViewTable),
-}));
+// 2. CountryGroupTable
+export const CountryGroupTable = pgTable("country_groups", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull().unique(),
+  recommendedDiscountPercentage: real("recommended_discount_percentage"),
+  createdAt,
+  updatedAt,
+});
 
+// 3. CountryTable
+export const CountryTable = pgTable("countries", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull().unique(),
+  code: text("code").notNull().unique(),
+  countryGroupId: uuid("country_group_id")
+    .notNull()
+    .references(() => CountryGroupTable.id, { onDelete: "cascade" }),
+  createdAt,
+  updatedAt,
+});
+
+// 4. ProductCustomizationTable
 export const ProductCustomizationTable = pgTable("product_customizations", {
   id: uuid("id").primaryKey().defaultRandom(),
   classPrefix: text("class_prefix"),
@@ -63,16 +81,7 @@ export const ProductCustomizationTable = pgTable("product_customizations", {
   updatedAt,
 });
 
-export const productCustomizationRelations = relations(
-  ProductCustomizationTable,
-  ({ one }) => ({
-    product: one(ProductTable, {
-      fields: [ProductCustomizationTable.productId],
-      references: [ProductTable.id],
-    }),
-  })
-);
-
+// 5. ProductViewTable
 export const ProductViewTable = pgTable("product_views", {
   id: uuid("id").primaryKey().defaultRandom(),
   productId: uuid("product_id")
@@ -86,52 +95,7 @@ export const ProductViewTable = pgTable("product_views", {
     .defaultNow(),
 });
 
-export const productViewRelations = relations(ProductViewTable, ({ one }) => ({
-  product: one(ProductTable, {
-    fields: [ProductViewTable.productId],
-    references: [ProductTable.id],
-  }),
-  country: one(CountryTable, {
-    fields: [ProductViewTable.countryId],
-    references: [CountryTable.id],
-  }),
-}));
-
-export const CountryTable = pgTable("countries", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull().unique(),
-  code: text("code").notNull().unique(),
-  countryGroupId: uuid("country_group_id")
-    .notNull()
-    .references(() => CountryGroupTable.id, { onDelete: "cascade" }),
-  createdAt,
-  updatedAt,
-});
-
-export const countryRelations = relations(CountryTable, ({ many, one }) => ({
-  countryGroups: one(CountryGroupTable, {
-    fields: [CountryTable.countryGroupId],
-    references: [CountryGroupTable.id],
-  }),
-  productViews: many(ProductViewTable),
-}));
-
-export const CountryGroupTable = pgTable("country_groups", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull().unique(),
-  recommendedDiscountPercentage: real("recommended_discount_percentage"),
-  createdAt,
-  updatedAt,
-});
-
-export const countryGroupRelations = relations(
-  CountryGroupTable,
-  ({ many }) => ({
-    countries: many(CountryTable),
-    countryGroupDiscounts: many(CountryGroupDiscountTable),
-  })
-);
-
+// 6. CountryGroupDiscountTable
 export const CountryGroupDiscountTable = pgTable(
   "country_group_discounts",
   {
@@ -151,6 +115,49 @@ export const CountryGroupDiscountTable = pgTable(
   })
 );
 
+// --- Relations ---
+export const productRelations = relations(ProductTable, ({ one, many }) => ({
+  productCustomization: one(ProductCustomizationTable),
+  productViews: many(ProductViewTable),
+}));
+
+export const productCustomizationRelations = relations(
+  ProductCustomizationTable,
+  ({ one }) => ({
+    product: one(ProductTable, {
+      fields: [ProductCustomizationTable.productId],
+      references: [ProductTable.id],
+    }),
+  })
+);
+
+export const productViewRelations = relations(ProductViewTable, ({ one }) => ({
+  product: one(ProductTable, {
+    fields: [ProductViewTable.productId],
+    references: [ProductTable.id],
+  }),
+  country: one(CountryTable, {
+    fields: [ProductViewTable.countryId],
+    references: [CountryTable.id],
+  }),
+}));
+
+export const countryRelations = relations(CountryTable, ({ many, one }) => ({
+  countryGroups: one(CountryGroupTable, {
+    fields: [CountryTable.countryGroupId],
+    references: [CountryGroupTable.id],
+  }),
+  productViews: many(ProductViewTable),
+}));
+
+export const countryGroupRelations = relations(
+  CountryGroupTable,
+  ({ many }) => ({
+    countries: many(CountryTable),
+    countryGroupDiscounts: many(CountryGroupDiscountTable),
+  })
+);
+
 export const countryGroupDiscountRelations = relations(
   CountryGroupDiscountTable,
   ({ one }) => ({
@@ -165,6 +172,7 @@ export const countryGroupDiscountRelations = relations(
   })
 );
 
+// --- Enums ---
 export const TierEnum = pgEnum(
   "tier",
   Object.keys(subscriptionTiers) as [TierNames]

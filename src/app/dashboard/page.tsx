@@ -13,6 +13,7 @@ export default async function DashboardPage() {
   const products = await getProducts(userId, { limit: 6 });
 
   if (products.length === 0) return <NoProducts />;
+
   return (
     <>
       <h2 className="mb-6 text-3xl font-semibold flex justify-between">

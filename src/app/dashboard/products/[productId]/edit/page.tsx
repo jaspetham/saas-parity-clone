@@ -12,12 +12,14 @@ import {
 } from "@/components/ui/card";
 import ProductDetailsForm from "@/app/dashboard/_components/forms/ProductDetailsForm";
 import CountryDiscountsForm from "@/app/dashboard/_components/forms/CountryDiscountsForm";
+import ProductCustomizationForm from "@/app/dashboard/_components/forms/ProductCustomizationForm";
 import { canCustomizeBanner, canRemoveBranding } from "@/server/permissions";
 
 export default async function EditProductPage(props: {
   params: { productId: string };
   searchParams: { tab?: string };
 }) {
+
   const { productId } = await props.params;
   const { tab = "details" } = await props.searchParams;
 
@@ -115,8 +117,6 @@ async function CustomizationsTab({
 
     if(customization == null) return notFound();
 
-    const canRemove = await canRemoveBranding(userId);
-
   return (
     <Card>
       <CardHeader>
@@ -124,9 +124,10 @@ async function CustomizationsTab({
       </CardHeader>
       <CardContent>
         <ProductCustomizationForm
-            canRemoveBranding={canRemove}
-            canCutomizeBanner={await canCustomizeBanner(userId)}
-            customization={customization}/>
+            customization={customization}
+            canRemoveBranding={await canRemoveBranding(userId)}
+            canCustomizeBanner={await canCustomizeBanner(userId)}
+        />
       </CardContent>
     </Card>
   );
