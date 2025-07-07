@@ -1,6 +1,7 @@
 "use client";
 
 import Banner from "@/components/Banner";
+import { NoPermissionCard } from "@/components/NoPermissionCard";
 import { RequiredLabelIcon } from "@/components/RequiredLabelIcon";
 import { Button } from "@/components/ui/button";
 import {
@@ -79,6 +80,11 @@ export default function ProductCustomizationForm({
           customization={formValues}
           canRemoveBranding={canRemoveBranding}
         />
+        {!canCustomizeBanner && (
+            <div className="mt-8">
+                <NoPermissionCard/>
+            </div>
+        )}
       </div>
       <Form {...form}>
         <form

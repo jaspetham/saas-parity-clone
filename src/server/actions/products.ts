@@ -14,17 +14,18 @@ import {
   updateCountryDiscounts as updateCountryDiscountsDb,
 } from "../db/products";
 import { redirect } from "next/navigation";
-import { updateProductCustomization as updateProductCustomizationDb } from '@/server/db/products';
+import { updateProductCustomization as updateProductCustomizationDb } from "@/server/db/products";
 import { canCustomizeBanner } from "../permissions";
-import { error } from "console";
+import { canCreateProduct } from "@/server/permissions";
 
 export async function createProduct(
   unsafeData: z.infer<typeof productDetailsSchema>
 ): Promise<{ error: boolean; message: string } | undefined> {
   const { userId } = await auth();
   const { success, data } = productDetailsSchema.safeParse(unsafeData);
+  const canCreate = await canCreateProduct(userId);
 
-  if (!success || userId === null) {
+  if (!success || userId === null || !canCreate) {
     return {
       error: true,
       message: "There was an error creating your product. Please try again.",
@@ -120,19 +121,21 @@ export async function updateCountryDiscounts(
   return { error: false, message: "Country discounts saved" };
 }
 
+export async function updateProductCustomization(
+  id: string,
+  unsafeData: z.infer<typeof productCustomizationSchema>
+) {
+  const { userId } = await auth();
+  const { success, data } = productCustomizationSchema.safeParse(unsafeData);
+  const canCustomize = await canCustomizeBanner(userId);
+  if (!success || userId === null || !canCustomize) {
+    return {
+      error: true,
+      message: "There was an error updating your banner. Please try again.",
+    };
+  }
 
-export async function updateProductCustomization(id:string, unsafeData: z.infer<typeof productCustomizationSchema>){
-    const { userId } = await auth();
-    const { success, data } = productCustomizationSchema.safeParse(unsafeData);
-    const canCustomize = await canCustomizeBanner(userId);
-    if(!success || userId === null || !canCustomize) {
-        return {
-            error: true,
-            message: "There was an error updating your banner. Please try again.",
-        };
-    }
+  await updateProductCustomizationDb(data, { productId: id, userId });
 
-    await updateProductCustomizationDb(data, {productId: id, userId})
-
-    return {error:false , message:"Banner updated successfully"};
+  return { error: false, message: "Banner updated successfully" };
 }
