@@ -19,6 +19,7 @@ import { z } from "zod";
 import { createProduct, updateProduct } from "@/server/actions/products";
 import { toast } from "sonner";
 import { useEffect } from "react";
+import { RequiredLabelIcon } from "@/components/RequiredLabelIcon";
 
 export default function ProductDetailsForm({
   product,
@@ -51,7 +52,8 @@ export default function ProductDetailsForm({
   }, [product, form]);
 
   async function onSubmit(values: z.infer<typeof productDetailsSchema>) {
-    const action = product == null ? createProduct : updateProduct.bind(null, product.id);
+    const action =
+      product == null ? createProduct : updateProduct.bind(null, product.id);
     const data = await action(values);
 
     if (data?.message) {
@@ -83,7 +85,9 @@ export default function ProductDetailsForm({
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Product Name</FormLabel>
+                <FormLabel>
+                  Product Name <RequiredLabelIcon />
+                </FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -96,7 +100,9 @@ export default function ProductDetailsForm({
             name="url"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Enter your website URL</FormLabel>
+                <FormLabel>
+                  Enter your website URL <RequiredLabelIcon />
+                </FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>

@@ -17,6 +17,7 @@ import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { BrandLogo } from "@/components/BrandLogo";
 import { Button } from "@/components/ui/button";
+import { env } from "@/data/env/client";
 
 export default function HomePage() {
   return (
@@ -93,7 +94,7 @@ export default function HomePage() {
             <FooterLinkGroup
               title="Help"
               links={[
-                { label: "PPP Discounts", href: "#" },
+                { label: `${env.NEXT_PUBLIC_PROJECT_TITLE} Discounts`, href: "#" },
                 { label: "Discount API", href: "#" },
               ]}
             />
@@ -109,7 +110,7 @@ export default function HomePage() {
           <div className="flex flex-col gap-8">
             <FooterLinkGroup
               title="Features"
-              links={[{ label: "PPP Discounts", href: "#" }]}
+              links={[{ label: `${env.NEXT_PUBLIC_PROJECT_TITLE} Discounts`, href: "#" }]}
             />
             <FooterLinkGroup
               title="Tools"

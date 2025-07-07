@@ -22,10 +22,10 @@ export function AddToSiteProductModalContent({ id }: { id: string }) {
   return (
     <DialogContent className="max-w-max">
       <DialogHeader>
-        <DialogTitle className="text-2xl">Start Earning PPP Sales!</DialogTitle>
+        <DialogTitle className="text-2xl">Start Earning {env.NEXT_PUBLIC_PROJECT_TITLE} Sales!</DialogTitle>
         <DialogDescription>
           All you need to do is copy the below script into your site and your
-          customer will start seeing PPP Discounts
+          customer will start seeing {env.NEXT_PUBLIC_PROJECT_TITLE} Discounts
         </DialogDescription>
       </DialogHeader>
       <pre className="mb-4 overflow-x-auto p-4 bg-secondary rounded max-w-screen-xl text-secondary-foreground">
