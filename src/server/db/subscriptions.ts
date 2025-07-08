@@ -1,7 +1,13 @@
 import { subscriptionTiers } from "@/data/subscriptionsTier";
 import { db } from "@/drizzle/db";
 import { UserSubscriptionTable } from "@/drizzle/schema";
-import { CACHE_TAGS, dbCache, getUserTag, revalidateDbCache } from "@/lib/cache";
+import {
+  CACHE_TAGS,
+  dbCache,
+  getUserTag,
+  revalidateDbCache,
+} from "@/lib/cache";
+import { SQL } from "drizzle-orm";
 
 export async function createUserSubscription(
   data: typeof UserSubscriptionTable.$inferInsert
@@ -35,25 +41,39 @@ export async function createUserSubscription(
     });
   }
 
-  return newSubscriptions
+  return newSubscriptions;
 }
 
-export function getUserSubscription(userId:string){
-    const cacheFn = dbCache(getUserSubscriptionInternal,{
-        tags:[getUserTag(userId, CACHE_TAGS.subscription)],
+export function getUserSubscription(userId: string) {
+  const cacheFn = dbCache(getUserSubscriptionInternal, {
+    tags: [getUserTag(userId, CACHE_TAGS.subscription)],
+  });
+
+  return cacheFn(userId);
+}
+
+export async function updateUserSubscription(
+  where: SQL,
+  data: Partial<typeof UserSubscriptionTable.$inferInsert>
+) {
+  const [updatedSubscription] = await db.update(UserSubscriptionTable).set(data).where(where).returning({id: UserSubscriptionTable.id, userId: UserSubscriptionTable.clerkUserId});
+  if(updateUserSubscription != null){
+    revalidateDbCache({
+        tag:CACHE_TAGS.subscription,
+        userId: updatedSubscription.userId,
+        id: updatedSubscription.id
     })
-
-    return cacheFn(userId)
+  }
 }
 
-export async function getUserSubscriptionTier(userId:string){
-    const subscription = await getUserSubscription(userId);
-    if(subscription == null) throw new Error("User subscription not found");
-    return subscriptionTiers[subscription.tier]
+export async function getUserSubscriptionTier(userId: string) {
+  const subscription = await getUserSubscription(userId);
+  if (subscription == null) throw new Error("User subscription not found");
+  return subscriptionTiers[subscription.tier];
 }
 
-function getUserSubscriptionInternal(userId:string){
-    return db.query.UserSubscriptionTable.findFirst({
-        where: ({ clerkUserId }, { eq }) => eq(clerkUserId, userId),
-    })
+function getUserSubscriptionInternal(userId: string) {
+  return db.query.UserSubscriptionTable.findFirst({
+    where: ({ clerkUserId }, { eq }) => eq(clerkUserId, userId),
+  });
 }
