@@ -56,13 +56,21 @@ export async function updateUserSubscription(
   where: SQL,
   data: Partial<typeof UserSubscriptionTable.$inferInsert>
 ) {
-  const [updatedSubscription] = await db.update(UserSubscriptionTable).set(data).where(where).returning({id: UserSubscriptionTable.id, userId: UserSubscriptionTable.clerkUserId});
-  if(updateUserSubscription != null){
+  const [updatedSubscription] = await db
+    .update(UserSubscriptionTable)
+    .set(data)
+    .where(where)
+    .returning({
+      id: UserSubscriptionTable.id,
+      userId: UserSubscriptionTable.clerkUserId,
+    });
+
+  if (updateUserSubscription != null) {
     revalidateDbCache({
-        tag:CACHE_TAGS.subscription,
-        userId: updatedSubscription.userId,
-        id: updatedSubscription.id
-    })
+      tag: CACHE_TAGS.subscription,
+      userId: updatedSubscription.userId,
+      id: updatedSubscription.id,
+    });
   }
 }
 

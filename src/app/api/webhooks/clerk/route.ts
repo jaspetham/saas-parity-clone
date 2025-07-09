@@ -1,7 +1,14 @@
-import { createUserSubscription } from "@/server/db/subscriptions";
+import { env } from "@/data/env/server";
+import {
+  createUserSubscription,
+  getUserSubscription,
+} from "@/server/db/subscriptions";
 import { deleteUser } from "@/server/db/users";
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
 import { NextRequest } from "next/server";
+import { Stripe } from "stripe";
+
+const stripe = new Stripe(env.STRIPE_SECRET_KEY);
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,14 +26,18 @@ export async function POST(req: NextRequest) {
       case "user.created": {
         await createUserSubscription({
           clerkUserId: id,
-          tier: "Free", // Default tier for new users
+          tier: "Free",
         });
         break;
       }
 
       case "user.deleted": {
-        if(id != null){
-            await deleteUser(id);
+        if (id != null) {
+          const userSubscription = await getUserSubscription(id);
+          if (userSubscription?.stripeCustomerId != null) {
+            await stripe.subscriptions.cancel(userSubscription.stripeCustomerId);
+          }
+          await deleteUser(id);
         }
         break;
       }

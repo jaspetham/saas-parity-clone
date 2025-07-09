@@ -1,7 +1,7 @@
 import { env } from "@/data/env/server";
 import { NextRequest } from "next/server";
 import Stripe from "stripe";
-import { getTierByPriceId } from "@/data/subscriptionsTier";
+import { getTierByPriceId, subscriptionTiers } from "@/data/subscriptionsTier";
 import { updateUserSubscription } from "@/server/db/subscriptions";
 import { UserSubscriptionTable } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
@@ -24,13 +24,12 @@ export async function POST(request: NextRequest) {
       await handleDelete(event.data.object);
       break;
     }
-    case "customer.subscription.updated":
-      {
-        await handleUpdate(event.data.object);
-        break;
-      }
-      return new Response(null, { status: 200 });
+    case "customer.subscription.updated": {
+      await handleUpdate(event.data.object);
+      break;
+    }
   }
+  return new Response(null, { status: 200 });
 }
 
 async function handleCreate(subscription: Stripe.Subscription) {
@@ -48,9 +47,37 @@ async function handleCreate(subscription: Stripe.Subscription) {
       stripeCustomerId: customerId,
       tier: tier.name,
       stripeSubscriptionId: subscription.id,
-      stripeSubscriptionItemId: subscription.items.data[0].id
+      stripeSubscriptionItemId: subscription.items.data[0].id,
     }
   );
 }
-async function handleDelete(subscription: Stripe.Subscription) {}
-async function handleUpdate(subscription: Stripe.Subscription) {}
+async function handleDelete(subscription: Stripe.Subscription) {
+  const tier = getTierByPriceId(subscription.items.data[0].price.id);
+  const customer = subscription.customer;
+  const customerId = typeof customer === "string" ? customer : customer.id;
+  if (tier == null) {
+    return new Response(null, { status: 500 });
+  }
+  return await updateUserSubscription(
+    eq(UserSubscriptionTable.stripeCustomerId, customerId),
+    {
+      tier: subscriptionTiers.Free.name,
+      stripeSubscriptionId: null,
+      stripeSubscriptionItemId: null,
+    }
+  );
+}
+async function handleUpdate(subscription: Stripe.Subscription) {
+  const tier = getTierByPriceId(subscription.items.data[0].price.id);
+  const customer = subscription.customer;
+  const customerId = typeof customer === "string" ? customer : customer.id;
+  if (tier == null) {
+    return new Response(null, { status: 500 });
+  }
+  return await updateUserSubscription(
+    eq(UserSubscriptionTable.stripeCustomerId, customerId),
+    {
+      tier: tier.name,
+    }
+  );
+}
