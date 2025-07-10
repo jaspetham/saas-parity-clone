@@ -1,6 +1,5 @@
 "use client";
-
-import Banner from "@/components/Banner";
+import { Banner } from "@/components/Banner";
 import { NoPermissionCard } from "@/components/NoPermissionCard";
 import { RequiredLabelIcon } from "@/components/RequiredLabelIcon";
 import { Button } from "@/components/ui/button";

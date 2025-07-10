@@ -1,6 +1,6 @@
 import { env } from "@/data/env/client";
 
-export default function Banner({
+export function Banner({
   message,
   mappings,
   customization,

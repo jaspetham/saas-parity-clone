@@ -117,11 +117,9 @@ export const CountryGroupDiscountTable = pgTable(
 
 // --- Relations ---
 export const productRelations = relations(ProductTable, ({ one, many }) => ({
-  productCustomization: one(ProductCustomizationTable, {
-    fields: [ProductTable.id],
-    references: [ProductCustomizationTable.productId],
-  }),
+  productCustomization: one(ProductCustomizationTable),
   productViews: many(ProductViewTable),
+  countryGroupDiscounts: many(CountryGroupDiscountTable),
 }));
 
 export const productCustomizationRelations = relations(
