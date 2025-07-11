@@ -49,22 +49,25 @@ export default function ProductCustomizationForm({
   });
 
   async function onSubmit(values: z.infer<typeof productCustomizationSchema>) {
-    const data = await updateProductCustomization(customization.productId, values)
+    const data = await updateProductCustomization(
+      customization.productId,
+      values
+    );
 
-    if(data?.message) {
-        if(data.error) {
-          toast.error("An error occurred", {
-            description: data.message,
-            position: "top-center",
-            richColors: true,
-          });
-        } else {
-          toast.success("Banner updated successfully!", {
-            description: data.message,
-            position: "top-center",
-            richColors: true,
-          });
-        }
+    if (data?.message) {
+      if (data.error) {
+        toast.error("An error occurred", {
+          description: data.message,
+          position: "top-center",
+          richColors: true,
+        });
+      } else {
+        toast.success("Banner updated successfully!", {
+          description: data.message,
+          position: "top-center",
+          richColors: true,
+        });
+      }
       return;
     }
   }
@@ -80,9 +83,9 @@ export default function ProductCustomizationForm({
           canRemoveBranding={canRemoveBranding}
         />
         {!canCustomizeBanner && (
-            <div className="mt-8">
-                <NoPermissionCard/>
-            </div>
+          <div className="mt-8">
+            <NoPermissionCard />
+          </div>
         )}
       </div>
       <Form {...form}>
@@ -110,6 +113,7 @@ export default function ProductCustomizationForm({
                   <FormDescription>
                     {"Data Parameters: {country}, {coupon}, {discount}"}
                   </FormDescription>
+                  <FormMessage />
                 </FormItem>
               )}
             />

@@ -6,6 +6,9 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { NextRequest } from "next/server";
 import { createElement } from "react";
+
+export const runtime = "edge"
+
 export async function GET(
   request: NextRequest,
   context: { params: { productId: string } }
@@ -79,7 +82,6 @@ async function getJavascript(
   canRemoveBranding: boolean
 ) {
   const { renderToStaticMarkup } = await import("react-dom/server");
-  console.log('in here')
   return `
         const banner = document.createElement("div");
         banner.innerHTML='${renderToStaticMarkup(
