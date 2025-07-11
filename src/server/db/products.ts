@@ -85,20 +85,15 @@ export function getProductForBanner({
   countryCode: string
   url: string
 }) {
-//   const cacheFn = dbCache(getProductForBannerInternal, {
-//     tags: [
-//       getIdTag(id, CACHE_TAGS.products),
-//       getGlobalTag(CACHE_TAGS.countries),
-//       getGlobalTag(CACHE_TAGS.countryGroups),
-//     ],
-//   })
+  const cacheFn = dbCache(getProductForBannerInternal, {
+    tags: [
+      getIdTag(id, CACHE_TAGS.products),
+      getGlobalTag(CACHE_TAGS.countries),
+      getGlobalTag(CACHE_TAGS.countryGroups),
+    ],
+  })
 
-//   return cacheFn({
-//     id,
-//     countryCode,
-//     url,
-//   })
-  return getProductForBannerInternal({
+  return cacheFn({
     id,
     countryCode,
     url,
@@ -397,7 +392,6 @@ async function getProductForBannerInternal({
     },
   })
 
-  console.log('data', data)
   const discount = data?.countryGroupDiscounts.find(
     discount => discount.countryGroup.countries.length > 0
   )
